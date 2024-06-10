@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const database = require("./core/database");
 const config = require("./core/config");
 const { ProductModel } = require("./models");
@@ -16,12 +17,20 @@ async function boot() {
 
   const app = express();
 
+  app.use(cors({ origin: "*" }));
+
   app.get("/", (req, res) => {
     return res.json({ status: "OK" });
   });
 
   app.get("/api/v1/products", authenticate, async (req, res) => {
     const { page = 0, limit = 10, query } = req.query;
+
+    if (page < 0 || limit < 0) {
+      return res
+        .status(400)
+        .json({ message: "Invalid format of page or limit" });
+    }
 
     if (page < 0 || limit < 0) {
       return res
@@ -64,7 +73,5 @@ async function boot() {
 async function stop() {
   await database.stop();
 }
-
-process.un;
 
 boot();
