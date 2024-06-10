@@ -20,7 +20,7 @@ async function boot() {
     return res.json({ status: "OK" });
   });
 
-  app.get("/api/v1/product", authenticate, async (req, res) => {
+  app.get("/api/v1/products", authenticate, async (req, res) => {
     const { page = 0, limit = 10, query } = req.query;
 
     if (page < 0 || limit < 0) {
