@@ -1,6 +1,6 @@
 const express = require("express");
-const fs = require('fs');
-const https = require('https');
+const fs = require("fs");
+const https = require("https");
 const cors = require("cors");
 const database = require("./core/database");
 const config = require("./core/config");
@@ -13,11 +13,6 @@ function authenticate(req, res, next) {
   }
   next();
 }
-
-const options = {
-  key: fs.readFileSync('/etc/letsencrypt/live/trangnt.duckdns.org/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/trangnt.duckdns.org/fullchain.pem')
-};
 
 async function boot() {
   await database.connect(config.dbUri);
@@ -72,13 +67,23 @@ async function boot() {
     return res.status(200).json({ health: "OK" });
   });
 
-  // app.listen(config.port, () => {
-  //   console.log(`Server is running at port:`, config.port);
-  // });
-
-  https.createServer(options, app).listen(443, () => {
-    console.log('HTTPS Server running on port 443');
-  });
+  if (config.env === "production") {
+    https
+      .createServer(
+        {
+          key: config.sslKeyPath ? fs.readFileSync(config.sslKeyPath) : "",
+          cert: config.sslCertPath ? fs.readFileSync(config.sslCertPath) : "",
+        },
+        app
+      )
+      .listen(config.port, () => {
+        console.log("Server running on port", config.port);
+      });
+  } else {
+    app.listen(config.port, () => {
+      console.log(`Server is running at port:`, config.port);
+    });
+  }
 }
 
 async function stop() {

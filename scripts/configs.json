@@ -1,0 +1,8 @@
+{
+  "DB_URI": "mongodb://localhost:27017/",
+  "TARGET_URL": "https://www.lazada.vn/locklock-flagship-store/?q=All-Products&from=wangpu&langFlag=vi&pageTypeId=2",
+  "STEPS": {
+    "crawlData": true,
+    "insertDB": true
+  }
+}

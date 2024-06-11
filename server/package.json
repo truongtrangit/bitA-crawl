@@ -6,7 +6,6 @@
   "scripts": {
     "start": "dotenv -e .env node index.js",
     "prod": "node ./index.js --prod",
-    "crawl": "node ./scripts/crawlData.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -16,15 +15,7 @@
     "cors": "^2.8.5",
     "dotenv-cli": "^7.4.2",
     "express": "^4.19.2",
-    "fake-useragent": "^1.0.1",
     "https": "^1.0.0",
-    "mongoose": "^8.4.1",
-    "puppeteer": "^22.10.0",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-adblocker": "^2.13.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2"
-  },
-  "engines": {
-    "node": "18.x"
+    "mongoose": "^8.4.1"
   }
 }

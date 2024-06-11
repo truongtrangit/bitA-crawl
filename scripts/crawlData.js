@@ -4,10 +4,9 @@ const AdblockerPlugin = require("puppeteer-extra-plugin-adblocker");
 const fs = require("fs");
 const path = require("path");
 const fakeUa = require("fake-useragent");
-const database = require("../core/database");
-const { DB_URI, STEPS, TARGET_URL } = require("./config.json");
-const { ProductModel } = require("../models");
-const { processData, scrollToEndOfPage, sleep } = require("../utils/puppeteer");
+const { DB_URI, STEPS, TARGET_URL } = require("./configs.json");
+const { processData, scrollToEndOfPage } = require("./utils/puppeteer");
+const { connectDatabase, delay } = require("./utils/utils");
 
 puppeteer.use(StealthPlugin());
 puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
@@ -110,10 +109,10 @@ async function crawlData(url) {
         await scrollToEndOfPage(page, "div.e5J1n");
         const _allProd = await crawlAllProducts(page);
 
-        fs.writeFileSync(
-          __dirname + `/out/out-${currentPage}.json`,
-          JSON.stringify(_allProd)
-        );
+        // fs.writeFileSync(
+        //   __dirname + `/out/out-${currentPage}.json`,
+        //   JSON.stringify(_allProd)
+        // );
 
         allProducts = allProducts.concat(_allProd);
 
@@ -132,7 +131,7 @@ async function crawlData(url) {
               page.click('li[title="Next Page"]'),
               page.waitForNavigation(),
             ]);
-            await sleep(2000);
+            await delay(2000);
             console.log("Clicked on the next page button.");
 
             let newUrl = await page.evaluate(() => window.location.href);
@@ -156,7 +155,7 @@ async function crawlData(url) {
                   page.waitForNavigation(),
                 ]);
                 console.log("Clicked on the next page button again");
-                await sleep(2000);
+                await delay(2000);
                 newUrl = await page.evaluate(() => window.location.href);
                 console.log("🚀 ~ newUrl:", newUrl);
                 const urlParams = new URLSearchParams(newUrl.split("?")[1]);
@@ -206,18 +205,18 @@ async function crawlData(url) {
         allProducts = JSON.parse(allProducts);
       }
 
-      await database.connect(DB_URI);
+      const dbIns = await connectDatabase(DB_URI);
 
-      await ProductModel.insertMany(allProducts);
+      await dbIns.collection("products").insertMany(allProducts);
 
-      await database.stop();
+      console.log("Inserted all products");
+      await dbIns.close();
     }
     //#endregion
     console.log(">>>>>> DONE <<<<<<");
     await browser?.close();
   } catch (error) {
     console.warn("CRAWL ERROR:", error);
-    // fs.writeFileSync(__dirname + "/products.json", JSON.stringify(allProducts));
     process.exit(1);
   }
 }

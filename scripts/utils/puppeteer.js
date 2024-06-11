@@ -1,13 +1,15 @@
+const { delay } = require("./utils");
+
 async function scrollToEndOfPage(page, footerSelector) {
   const distance = 100;
-  const delay = 200;
+  const delayTime = 200;
 
   let isNearFooter = false;
   while (!isNearFooter) {
     await page.evaluate((y) => {
       window.scrollBy(0, y);
     }, distance);
-    await sleep(delay);
+    await delay(delayTime);
 
     isNearFooter = await page.evaluate(
       (footerSelector, distance) => {
@@ -57,16 +59,7 @@ function processData(data) {
   return data;
 }
 
-function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve();
-    }, ms);
-  });
-}
-
 module.exports = {
   processData,
   scrollToEndOfPage,
-  sleep,
 };
