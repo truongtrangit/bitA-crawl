@@ -1,4 +1,6 @@
 const express = require("express");
+const fs = require('fs');
+const https = require('https');
 const cors = require("cors");
 const database = require("./core/database");
 const config = require("./core/config");
@@ -11,6 +13,11 @@ function authenticate(req, res, next) {
   }
   next();
 }
+
+const options = {
+  key: fs.readFileSync('/etc/letsencrypt/live/trangnt.duckdns.org/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/trangnt.duckdns.org/fullchain.pem')
+};
 
 async function boot() {
   await database.connect(config.dbUri);
@@ -65,8 +72,12 @@ async function boot() {
     return res.status(200).json({ health: "OK" });
   });
 
-  app.listen(config.port, () => {
-    console.log(`Server is running at port:`, config.port);
+  // app.listen(config.port, () => {
+  //   console.log(`Server is running at port:`, config.port);
+  // });
+
+  https.createServer(options, app).listen(443, () => {
+    console.log('HTTPS Server running on port 443');
   });
 }
 
