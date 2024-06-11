@@ -6,6 +6,7 @@ import {
   CircularProgress,
   Container,
   Typography,
+  Box,
 } from "@mui/material";
 import ProductCard from "./ProductCard";
 import Pagination from "./Pagination";
@@ -75,7 +76,14 @@ const ProductList = () => {
         onChange={handleSearch}
       />
       {loading ? (
+        <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="75vh"
+      >
         <CircularProgress />
+      </Box>
       ) : (
         <Grid container spacing={4} style={{ marginTop: 5 }}>
           {products?.map((product) => (
